@@ -25,6 +25,7 @@ const musicas = [
   { id: 11, titulo: 'Superfantástico', artista: 'A turma do balão mágico', genero: 'MPB', ano: 1983 },
   { id: 12, titulo: 'Alone', artista: 'Marshmello', genero: 'Eletrônica', ano: 2016 },
   { id: 13, titulo: 'O descobridor dos sete mares', artista: 'Tim Maia', genero: 'MPB', ano: 1983 },
+  
 ];
 
 
