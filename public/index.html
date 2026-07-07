@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Request - Sistema de Pedidos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Roboto:wght@400;500&amp;display=swap');
+
+        :root {
+            --primary-green: #0a3d2a;
+            --accent-green: #1cc28a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f4f0 0%, #d4e8d4 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(10, 61, 42, 0.3);
+            margin-bottom: 2rem;
+            border-radius: 0 0 16px 16px;
+        }
+
+        header h1 { font-size: 2.2rem; font-weight: 600; }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 28px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .card h2 {
+            color: var(--primary-green);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid var(--accent-green);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        button {
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: #16a875;
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 14px 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover { background-color: #f8fffb; }
+
+        .message {
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--accent-green);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🎵 Music Request</h1>
+            <p>Sistema de Busca e Pedidos de Músicas</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="cards-container">
+
+            <!-- CARD 1: LOGIN -->
+            <div class="card">
+                <h2>🔑 Login</h2>
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" placeholder="Digite seu usuário">
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" placeholder="Digite sua senha">
+                </div>
+                <button onclick="fazerLogin()">Entrar</button>
+                <div id="login-message" class="message"></div>
+            </div>
+
+            <!-- CARD 2: BUSCAR MÚSICAS -->
+            <div class="card">
+                <h2>🔍 Buscar Músicas</h2>
+                <div class="form-group">
+                    <label for="genero">Gênero</label>
+                    <select id="genero">
+                        <option value="">Todos</option>
+                        <option value="Rock">Rock</option>
+                        <option value="Pop">Pop</option>
+                        <option value="Rap">Rap</option>
+                        <option value="Pagode">Pagode</option>
+                        <option value="Sertanejo">Sertanejo</option>
+                        <option value="Eletrônica">Eletrônica</option>
+                        <option value="MPB">MPB</option>
+                    </select>
+                </div>
+                <button onclick="listarMusicas()">Buscar</button>
+                
+                <div id="musicas-loading" class="loading" style="display: none;">Carregando músicas...</div>
+                <div id="musicas-message" class="message"></div>
+                
+                <table id="tabela-musicas" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Artista</th>
+                            <th>Gênero</th>
+                            <th>Ano</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-musicas"></tbody>
+                </table>
+            </div>
+
+            <!-- CARD 3: BUSCAR ARTISTA -->
+            <div class="card">
+                <h2>🎤 Buscar Artista</h2>
+                <div class="form-group">
+                    <label for="nome-artista">Nome do Artista</label>
+                    <input type="text" id="nome-artista" placeholder="Ex: Queen">
+                </div>
+                <button onclick="buscarArtista()">Pesquisar</button>
+                
+                <div id="artista-loading" class="loading" style="display: none;">Buscando...</div>
+                <div id="artista-message" class="message"></div>
+                
+                <table id="tabela-artista" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Ano</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-artista"></tbody>
+                </table>
+            </div>
+
+            <!-- CARD 4: SOLICITAR MÚSICA -->
+            <div class="card">
+                <h2>📩 Solicitar Música</h2>
+                <div class="form-group">
+                    <label for="nome-pessoa">Seu Nome</label>
+                    <input type="text" id="nome-pessoa" placeholder="Seu nome completo">
+                </div>
+                <div class="form-group">
+                    <label for="id-musica">ID da Música</label>
+                    <input type="number" id="id-musica" placeholder="Ex: 5">
+                </div>
+                <button onclick="enviarPedido()">Solicitar Música</button>
+                <div id="pedido-message" class="message"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let token = null;
+
+        // ==================== LOGIN ====================
+        async function fazerLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const messageEl = document.getElementById('login-message');
+
+            if (!username || !password) {
+                showMessage(messageEl, 'Preencha usuário e senha', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario: username, senha: password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    token = data.token;
+                    showMessage(messageEl, 'Login realizado com sucesso!', 'success');
+                    setTimeout(() => listarMusicas(), 800);
+                } else {
+                    showMessage(messageEl, data.message || 'Credenciais inválidas', 'error');
+                }
+            } catch (error) {
+                showMessage(messageEl, 'Erro ao conectar ao servidor.', 'error');
+            }
+        }
+
+        // ==================== BUSCAR MÚSICAS ====================
+        async function listarMusicas() {
+            const genero = document.getElementById('genero').value;
+            const tbody = document.getElementById('tbody-musicas');
+            const table = document.getElementById('tabela-musicas');
+            const loading = document.getElementById('musicas-loading');
+            const messageEl = document.getElementById('musicas-message');
+
+            loading.style.display = 'block';
+            table.style.display = 'none';
+            messageEl.style.display = 'none';
+
+            try {
+                let url = 'http://localhost:3000/musicas';
+                if (genero) url += `?genero=${genero}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                loading.style.display = 'none';
+
+                if (data.length === 0) {
+                    showMessage(messageEl, 'Nenhuma música encontrada.', 'error');
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                data.forEach(m => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td><strong>${m.id}</strong></td><td>${m.titulo}</td><td>${m.artista}</td><td>${m.genero}</td><td>${m.ano}</td>`;
+                    tbody.appendChild(tr);
+                });
+                table.style.display = 'table';
+            } catch (error) {
+                loading.style.display = 'none';
+                showMessage(messageEl, 'Erro ao carregar músicas.', 'error');
+            }
+        }
+
+        // ==================== BUSCAR ARTISTA ====================
+        async function buscarArtista() {
+            const nomeArtista = document.getElementById('nome-artista').value.trim();
+            const tbody = document.getElementById('tbody-artista');
+            const table = document.getElementById('tabela-artista');
+            const loading = document.getElementById('artista-loading');
+            const messageEl = document.getElementById('artista-message');
+
+            if (!nomeArtista) {
+                showMessage(messageEl, 'Digite o nome do artista', 'error');
+                return;
+            }
+
+            loading.style.display = 'block';
+            table.style.display = 'none';
+
+            try {
+                const response = await fetch(`http://localhost:3000/artistas?artista=${encodeURIComponent(nomeArtista)}`);
+                const data = await response.json();
+
+                loading.style.display = 'none';
+
+                if (data.length === 0) {
+                    showMessage(messageEl, 'Nenhuma música encontrada.', 'error');
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                data.forEach(m => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td><strong>${m.id}</strong></td><td>${m.titulo}</td><td>${m.ano}</td>`;
+                    tbody.appendChild(tr);
+                });
+                table.style.display = 'table';
+            } catch (error) {
+                loading.style.display = 'none';
+                showMessage(messageEl, 'Erro ao buscar artista.', 'error');
+            }
+        }
+
+        // ==================== SOLICITAR MÚSICA ====================
+        async function enviarPedido() {
+            const nome = document.getElementById('nome-pessoa').value.trim();
+            const idMusica = document.getElementById('id-musica').value.trim();
+            const messageEl = document.getElementById('pedido-message');
+
+            if (!nome || !idMusica) {
+                showMessage(messageEl, 'Preencha nome e ID da música', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/pedidos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        nome: nome, 
+                        musicaId: Number(idMusica) 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(messageEl, data.message || 'Pedido realizado!', 'success');
+                    document.getElementById('nome-pessoa').value = '';
+                    document.getElementById('id-musica').value = '';
+                } else {
+                    showMessage(messageEl, data.message || 'Erro ao realizar pedido', 'error');
+                }
+            } catch (error) {
+                showMessage(messageEl, 'Erro ao conectar ao servidor.', 'error');
+            }
+        }
+
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+            setTimeout(() => element.style.display = 'none', 5000);
+        }
+
+        // Inicialização
+        window.onload = () => {
+            console.log('%c🎵 Music Request carregado!', 'color: #1cc28a; font-size: 16px');
+        };
+    </script>
+</body>
+</html>
