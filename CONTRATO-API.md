@@ -7,8 +7,8 @@
 | GET    | `/`         | —                                                   | página HTML (frontend)          | 200             |
 | GET    | `/musicas`  | `genero` (query URL, opcional)                      | lista de músicas em JSON        | 200             |
 | GET    | `/artistas` | `artista` (query URL, opcional)                     | lista de artistas em JSON       | 200             |
-| POST   | `/pedidos`  | `nome`, `musicaId`, `nomeArtista` (body JSON)        | confirmação do pedido           | 200 / 400 / 404 |
-| POST   | `/login`    | `usuario`, `senha` (body JSON)                       | mensagem de sucesso / erro      | 200 / 401       |
+| POST   | `/pedidos`  | `nome`, `musicaId` (body JSON)                      | confirmação do pedido           | 200 / 400 / 404 |
+| POST   | `/login`    | `usuario`, `senha` (body JSON)                      | mensagem de sucesso / erro      | 200 / 401       |
 
 ## Decisões de projeto (justificar no contrato!)
 
