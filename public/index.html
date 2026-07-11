@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Request - Sistema de Pedidos</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Roboto:wght@400;500&amp;display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@400;500&display=swap');
 
         :root {
             --primary-green: #0a3d2a;
@@ -21,11 +21,7 @@
             min-height: 100vh;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
         header {
             background-color: var(--primary-green);
@@ -66,9 +62,7 @@
             padding-bottom: 10px;
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
+        .form-group { margin-bottom: 18px; }
 
         label {
             display: block;
@@ -160,7 +154,7 @@
     <div class="container">
         <div class="cards-container">
 
-            <!-- CARD 1: LOGIN -->
+            <!-- LOGIN -->
             <div class="card">
                 <h2>🔑 Login</h2>
                 <div class="form-group">
@@ -175,7 +169,7 @@
                 <div id="login-message" class="message"></div>
             </div>
 
-            <!-- CARD 2: BUSCAR MÚSICAS -->
+            <!-- BUSCAR MÚSICAS -->
             <div class="card">
                 <h2>🔍 Buscar Músicas</h2>
                 <div class="form-group">
@@ -210,7 +204,7 @@
                 </table>
             </div>
 
-            <!-- CARD 3: BUSCAR ARTISTA -->
+            <!-- BUSCAR ARTISTA -->
             <div class="card">
                 <h2>🎤 Buscar Artista</h2>
                 <div class="form-group">
@@ -234,7 +228,7 @@
                 </table>
             </div>
 
-            <!-- CARD 4: SOLICITAR MÚSICA -->
+            <!-- SOLICITAR MÚSICA -->
             <div class="card">
                 <h2>📩 Solicitar Música</h2>
                 <div class="form-group">
@@ -255,6 +249,13 @@
     <script>
         let token = null;
 
+        function showMessage(element, text, type = 'error') {
+            element.textContent = text;
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+            setTimeout(() => element.style.display = 'none', 6000);
+        }
+
         // ==================== LOGIN ====================
         async function fazerLogin() {
             const username = document.getElementById('username').value.trim();
@@ -273,14 +274,13 @@
                     body: JSON.stringify({ usuario: username, senha: password })
                 });
 
-                const data = await response.json();
+                const data = await response.json().catch(() => ({}));
 
                 if (response.ok) {
                     token = data.token;
-                    showMessage(messageEl, 'Login realizado com sucesso!', 'success');
-                    setTimeout(() => listarMusicas(), 800);
+                    showMessage(messageEl, data.mensagem || 'Login realizado com sucesso!', 'success');
                 } else {
-                    showMessage(messageEl, data.message || 'Credenciais inválidas', 'error');
+                    showMessage(messageEl, data.erro || data.mensagem || 'Usuário ou senha incorretos', 'error');
                 }
             } catch (error) {
                 showMessage(messageEl, 'Erro ao conectar ao servidor.', 'error');
@@ -316,7 +316,12 @@
                 tbody.innerHTML = '';
                 data.forEach(m => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td><strong>${m.id}</strong></td><td>${m.titulo}</td><td>${m.artista}</td><td>${m.genero}</td><td>${m.ano}</td>`;
+                    tr.innerHTML = `
+                        <td><strong>${m.id}</strong></td>
+                        <td>${m.titulo}</td>
+                        <td>${m.artista}</td>
+                        <td>${m.genero}</td>
+                        <td>${m.ano}</td>`;
                     tbody.appendChild(tr);
                 });
                 table.style.display = 'table';
@@ -341,6 +346,7 @@
 
             loading.style.display = 'block';
             table.style.display = 'none';
+            messageEl.style.display = 'none';
 
             try {
                 const response = await fetch(`http://localhost:3000/artistas?artista=${encodeURIComponent(nomeArtista)}`);
@@ -348,8 +354,13 @@
 
                 loading.style.display = 'none';
 
+                if (!response.ok) {
+                    showMessage(messageEl, data.erro || 'Erro ao buscar artista', 'error');
+                    return;
+                }
+
                 if (data.length === 0) {
-                    showMessage(messageEl, 'Nenhuma música encontrada.', 'error');
+                    showMessage(messageEl, 'Nenhuma música encontrada para este artista.', 'error');
                     return;
                 }
 
@@ -387,28 +398,20 @@
                     })
                 });
 
-                const data = await response.json();
+                const data = await response.json().catch(() => ({}));
 
                 if (response.ok) {
-                    showMessage(messageEl, data.message || 'Pedido realizado!', 'success');
+                    showMessage(messageEl, data.mensagem || 'Pedido recebido!', 'success');
                     document.getElementById('nome-pessoa').value = '';
                     document.getElementById('id-musica').value = '';
                 } else {
-                    showMessage(messageEl, data.message || 'Erro ao realizar pedido', 'error');
+                    showMessage(messageEl, data.erro || 'Erro ao realizar pedido', 'error');
                 }
             } catch (error) {
                 showMessage(messageEl, 'Erro ao conectar ao servidor.', 'error');
             }
         }
 
-        function showMessage(element, text, type) {
-            element.textContent = text;
-            element.className = `message ${type}`;
-            element.style.display = 'block';
-            setTimeout(() => element.style.display = 'none', 5000);
-        }
-
-        // Inicialização
         window.onload = () => {
             console.log('%c🎵 Music Request carregado!', 'color: #1cc28a; font-size: 16px');
         };
