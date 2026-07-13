@@ -16,7 +16,8 @@ const musicas = [
   { id: 10, titulo: 'Believer',                       artista: 'Imagine Dragons',          genero: 'Rock',       ano: 2017 },
   { id: 11, titulo: 'Superfantástico',                artista: 'A turma do balão mágico',  genero: 'MPB',        ano: 1983 },
   { id: 12, titulo: 'Alone',                          artista: 'Marshmello',               genero: 'Eletrônica', ano: 2016 },
-  { id: 13, titulo: 'O descobridor dos sete mares',   artista: 'Tim Maia',                 genero: 'MPB',        ano: 1983 }
+  { id: 13, titulo: 'O descobridor dos sete mares',   artista: 'Tim Maia',                 genero: 'MPB',        ano: 1983 },
+  { id: 14, titulo: 'A Little Piece of Heaven',       artista: 'Avenged Sevenfold',        genero: 'Rock',       ano: 2007 },
 ];
 
 const usuario = "layon";
